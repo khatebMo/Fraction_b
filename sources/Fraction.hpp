@@ -28,7 +28,9 @@ namespace ariel
         // help function
         int gcd();
         void redues();
-        Fraction convert(float number);
+        Fraction convertToFraction(float number);
+        friend float convertToFloat(Fraction temp);
+        bool checkOverflow(const Fraction &fraction1, const Fraction &fraction2, char sign)const;
 
         // setters
         void setNumerator(int number);
@@ -78,8 +80,8 @@ namespace ariel
         Fraction operator++(int);
         Fraction operator--();
         Fraction operator--(int);
-        friend ostream &operator<<(ostream &os, const Fraction& other);
-        friend istream &operator>>(istream &is,  Fraction &other);
+        friend ostream &operator<<(ostream &, const Fraction& other);
+        friend istream &operator>>(istream &,  Fraction &other);
     };
 
 }

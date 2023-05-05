@@ -8,6 +8,7 @@
 #include "Fraction.hpp"
 #include <cmath>
 #include <limits>
+#include <algorithm>
 
 namespace ariel
 {
@@ -20,11 +21,11 @@ namespace ariel
     {
         if (denominator == 0)
         {
-            throw std::invalid_argument("Divide by zero! , The dennominator can't be 0!") ;
+            throw std::invalid_argument("Divide by zero! , The dennominator can't be 0!");
         }
         int nu = numerator;
         int de = denominator;
-        if (nu < 0 && de < 0)
+        if (de < 0)
         {
             nu *= -1;
             de *= -1;
@@ -36,11 +37,18 @@ namespace ariel
     }
     Fraction::Fraction(float n)
     {
-        Fraction temp = convert(n);
+        Fraction temp = convertToFraction(n);
         this->setDenominator(temp.getDenominator());
         this->setNumerator(temp.getNumerator());
         redues();
     }
+    float convertToFloat(Fraction temp)
+    {
+        float number = temp.numerator / temp.denominator;
+        number = (std::round(number * 1000)) / 1000;
+        return number;
+    }
+
     int Fraction::gcd()
     {
         int max;
@@ -76,18 +84,19 @@ namespace ariel
     }
     void Fraction::redues()
     {
+        int gcd =std::__gcd(numerator,denominator);
+        this->setDenominator(this->getDenominator() / gcd);
+        this->setNumerator(this->getNumerator() / gcd);
         if (this->denominator < 0)
         {
             denominator *= -1;
             numerator *= -1;
         }
-        int gcd = this->gcd();
-        this->setDenominator(this->getDenominator() / gcd);
-        this->setNumerator(this->getNumerator() / gcd);
     }
-    Fraction Fraction::convert(float number)
+    Fraction Fraction::convertToFraction(float number)
     {
-        int num = number * 1000;
+        int num = roundf(number * 1000);
+
         int deno = 1000;
         Fraction franc(num, deno);
         return franc;
@@ -111,6 +120,10 @@ namespace ariel
 
     Fraction Fraction::operator+(const Fraction &other) const
     {
+        if (checkOverflow(*this, other, '+'))
+        {
+            throw overflow_error("OVERFLOW!!");
+        }
         int newNum = this->numerator * other.denominator + this->denominator * other.numerator;
         int newDen = this->denominator * other.denominator;
         Fraction fraction(newNum, newDen);
@@ -139,6 +152,10 @@ namespace ariel
     }
     Fraction Fraction::operator-(const Fraction &other) const
     {
+        if (checkOverflow(*this, other, '-'))
+        {
+            throw overflow_error("OVERFLOW!!");
+        }
         int newNum = this->numerator * other.denominator - this->denominator * other.numerator;
         int newDen = this->denominator * other.denominator;
         Fraction fraction(newNum, newDen);
@@ -157,6 +174,10 @@ namespace ariel
     }
     Fraction Fraction::operator*(const Fraction &other) const
     {
+        if (checkOverflow(*this, other, '*'))
+        {
+            throw overflow_error("OVERFLOW!!");
+        }
         int newNume = this->numerator * other.numerator;
         int newDeno = this->denominator * other.denominator;
         Fraction fraction(newNume, newDeno);
@@ -174,9 +195,15 @@ namespace ariel
         return other / temp;
     }
     Fraction Fraction::operator/(const Fraction &other) const
-    {   
-        if(other.numerator==0){
+    {
+
+        if (other.numerator == 0)
+        {
             throw std::runtime_error("can't divide by zero");
+        }
+        if (checkOverflow(*this, other, '/'))
+        {
+            throw overflow_error("OVERFLOW!!");
         }
         int newNume = this->numerator * other.denominator;
         int newDeno = this->denominator * other.numerator;
@@ -195,12 +222,36 @@ namespace ariel
         return other == temp;
     }
     bool Fraction::operator==(const Fraction &other) const
+    // {   float num1=convertToFloat(*this);
     {
-        if (this->numerator * other.denominator == this->denominator * other.numerator)
+        //     //std::round((this->numerator * other.denominator) * 1000) / 1000;
+        //     float num2=convertToFloat(other);
+        //    // std::floor(number * 1000) / 1000;
+        if (this->numerator * other.denominator == other.numerator * this->denominator)
         {
             return true;
         }
         return false;
+    }
+    bool Fraction::checkOverflow(const Fraction &fraction1, const Fraction &fraction2, char sign)const
+    {
+        switch (sign)
+        {
+        case '+':
+            return ((fraction1.numerator == std::numeric_limits<int>::max() && fraction1.denominator != std::numeric_limits<int>::max()) || (fraction2.denominator == std::numeric_limits<int>::max() && fraction2.denominator != std::numeric_limits<int>::max()) || (fraction1.numerator <= std::numeric_limits<int>::min() + 100) && (fraction2.numerator <= std::numeric_limits<int>::min() + 100));
+
+        case '-':
+            return ((fraction1.numerator <= std::numeric_limits<int>::min() + 100 && fraction2.numerator <= std::numeric_limits<int>::min() + 100) || (fraction1.numerator >= std::numeric_limits<int>::max() - 100 && fraction2.numerator <= std::numeric_limits<int>::min() + 100));
+
+        case '*':
+            return ((fraction1.numerator == std::numeric_limits<int>::max() && fraction1.denominator != std::numeric_limits<int>::max()) || (fraction1.denominator == std::numeric_limits<int>::max() && fraction2.numerator != std::numeric_limits<int>::max()) || (fraction2.numerator == std::numeric_limits<int>::max() && fraction2.denominator != std::numeric_limits<int>::max()) || (fraction2.denominator == std::numeric_limits<int>::max() && fraction2.denominator != std::numeric_limits<int>::max()));
+
+        case '/':
+            return ((fraction1.numerator == std::numeric_limits<int>::max() && fraction1.denominator != std::numeric_limits<int>::max()) || (fraction1.denominator == std::numeric_limits<int>::max() && fraction1.numerator < std::numeric_limits<int>::max() - 100));
+
+        default:
+            return false;
+        }
     }
 
     bool operator<=(const float &number, const Fraction &other)
@@ -311,7 +362,7 @@ namespace ariel
         this->setNumerator(this->numerator - this->denominator);
         return *this;
     }
-    ostream &operator<<(ostream &os, const Fraction& other)
+    ostream &operator<<(ostream &os, const Fraction &other)
     {
         os << other.numerator << "/" << other.denominator;
         return os;
