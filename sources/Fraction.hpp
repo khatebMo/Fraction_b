@@ -8,7 +8,6 @@ using namespace std;
 
 namespace ariel
 {
-
     class Fraction
     {
     private:
@@ -30,7 +29,7 @@ namespace ariel
         void redues();
         Fraction convertToFraction(float number);
         friend float convertToFloat(Fraction temp);
-        bool checkOverflow(const Fraction &fraction1, const Fraction &fraction2, char sign)const;
+        bool checkOverflow(int , int , char) const;
 
         // setters
         void setNumerator(int number);
@@ -73,8 +72,7 @@ namespace ariel
         friend bool operator>=(const float& number, const Fraction &other);
         friend bool operator>=(const Fraction &other, const float& number);
 
-        friend bool checkOverflow(const Fraction &fraction1, const Fraction &fraction2, char sign);
-
+      //  friend bool checkOverflow(const Fraction &fraction1, const Fraction &fraction2, char sign);
 
         Fraction operator++();
         Fraction operator++(int);
