@@ -72,8 +72,6 @@ namespace ariel
         friend bool operator>=(const float& number, const Fraction &other);
         friend bool operator>=(const Fraction &other, const float& number);
 
-      //  friend bool checkOverflow(const Fraction &fraction1, const Fraction &fraction2, char sign);
-
         Fraction operator++();
         Fraction operator++(int);
         Fraction operator--();
