@@ -29,7 +29,7 @@ namespace ariel
             nu *= -1;
             de *= -1;
         }
-
+        
         this->numerator = nu;
         this->denominator = de;
         redues();
@@ -48,39 +48,6 @@ namespace ariel
         return number;
     }
 
-    int Fraction::gcd()
-    {
-        int max;
-        int gcd;
-        int a = this->getDenominator();
-        int b = this->getNumerator();
-        if (a == 0)
-        {
-            return b;
-        }
-        if (b == 0)
-        {
-            return a;
-        }
-        if (a >= b)
-        {
-            max = a;
-        }
-        else
-        {
-            max = b;
-        }
-        for (int i = max; i > 0; i--)
-        {
-            if (a % i == 0 && b % i == 0)
-            {
-                gcd = i;
-                break;
-            }
-        }
-
-        return gcd;
-    }
     void Fraction::redues()
     {
         int gcd = std::__gcd(numerator, denominator);
@@ -95,7 +62,6 @@ namespace ariel
     Fraction Fraction::convertToFraction(float number)
     {
         int num = roundf(number * 1000);
-
         int deno = 1000;
         Fraction franc(num, deno);
         return franc;
@@ -257,7 +223,7 @@ namespace ariel
         return false;
     }
 
-    bool operator>=(const float &number, const Fraction &other)
+    bool  operator>=(const float &number, const Fraction &other)
     {
         Fraction temp(number);
         return temp >= other;
@@ -368,8 +334,8 @@ namespace ariel
 
     bool Fraction::checkOverflow(int a, int b, char op) const
     {
-        int maxInt = std::numeric_limits<int>::max();
-        int minInt = std::numeric_limits<int>::min();
+        // int maxInt = std::numeric_limits<int>::max();
+        // int minInt = std::numeric_limits<int>::min();
         if (op == '+')
         {
             if (a > 0 && b > 0 && (a + b) < 0)

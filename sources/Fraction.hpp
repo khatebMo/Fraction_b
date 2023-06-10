@@ -25,7 +25,6 @@ namespace ariel
         int getDenominator();
 
         // help function
-        int gcd();
         void redues();
         Fraction convertToFraction(float number);
         friend float convertToFloat(Fraction temp);
